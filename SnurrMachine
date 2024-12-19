@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slot Machine Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="balance">Balance: 100 SEK</div>
+
+    <div id="slot-machine">
+        <div class="slots">
+            <!-- Slot with images -->
+            <div class="slot" id="slot1"><img id="symbol1" src="cherry.png" alt="cherry"></div>
+            <div class="slot" id="slot2"><img id="symbol2" src="bell.png" alt="bell"></div>
+            <div class="slot" id="slot3"><img id="symbol3" src="seven.png" alt="seven"></div>
+        </div>
+
+        <div id="buttons">
+            <button id="spin-btn">Spin</button>
+        </div>
+    </div>
+
+    <div id="result"></div>
+
+    <!-- Link to the JavaScript file -->
+    <script src="script.js"></script>
+</body>
+</html>
+
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  background-color: #222;
+  color: white;
+  margin: 0;
+  padding: 0;
+}
+
+#slot-machine {
+  display: inline-block;
+  border: 5px solid gold;
+  padding: 20px;
+  background-color: #444;
+  width: 90%;
+  max-width: 400px;
+  margin: 20px auto;
+}
+
+.slots {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap; /* Allow flexibility for smaller screens */
+  margin-bottom: 20px;
+}
+
+.slot {
+  width: 80px;
+  height: 80px;
+  background-color: white;
+  border: 2px solid #000;
+  border-radius: 10px;
+  text-align: center;
+  margin: 5px;
+}
+
+.slot img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 18px;
+  color: white;
+  background-color: green;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:disabled {
+  background-color: gray;
+  cursor: not-allowed;
+}
+
+#balance {
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+#result {
+  font-size: 18px;
+  margin-top: 10px;
+  color: yellow;
+}
+
+// Initialize variables
+let balance = 100;
+const balanceElement = document.getElementById('balance');
+const spinButton = document.getElementById('spin-btn');
+
+// Symbols and payout values
+const symbols = [
+    { src: 'cherry.png', alt: 'cherry', payout: 20 },
+    { src: 'bell.png', alt: 'bell', payout: 30 },
+    { src: 'seven.png', alt: 'seven', payout: 50 },
+    { src: 'bars.png', alt: 'bars', payout: 70 }
+];
+
+// Update balance display
+function updateBalance(amount) {
+    balance += amount;
+    balanceElement.textContent = `Balance: ${balance} SEK`;
+}
+
+// Get a random symbol
+function getRandomSymbol() {
+    return symbols[Math.floor(Math.random() * symbols.length)];
+}
+
+// Spin function
+function spin() {
+    if (spinButton.disabled) return; // Prevent multiple clicks
+    if (balance < 5) {
+        document.getElementById('result').textContent = 'Not enough balance!';
+        return;
+    }
+
+    document.getElementById('result').textContent = ''; // Clear previous result
+    updateBalance(-5); // Deduct bet amount
+    spinButton.disabled = true;
+
+    // Get random symbols
+    const slot1 = getRandomSymbol();
+    const slot2 = getRandomSymbol();
+    const slot3 = getRandomSymbol();
+
+    // Update slot images
+    document.getElementById('symbol1').src = slot1.src;
+    document.getElementById('symbol1').alt = slot1.alt;
+    document.getElementById('symbol2').src = slot2.src;
+    document.getElementById('symbol2').alt = slot2.alt;
+    document.getElementById('symbol3').src = slot3.src;
+    document.getElementById('symbol3').alt = slot3.alt;
+
+    // Check for a win
+    if (slot1.src === slot2.src && slot2.src === slot3.src) {
+        const payout = slot1.payout;
+        updateBalance(payout);
+        setTimeout(() => {
+            document.getElementById('result').textContent = `You win ${payout} SEK!`;
+        }, 1200);
+    }
+
+    // Re-enable button after cooldown
+    setTimeout(() => {
+        spinButton.disabled = false;
+    }, 1200);
+}
+
+// Add event listener
+spinButton.addEventListener('click', spin);
